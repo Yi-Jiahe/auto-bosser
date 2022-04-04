@@ -1,0 +1,48 @@
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-template-rows: auto auto auto auto auto;
+}
+
+.player-stats {
+    grid-row-start: 1;
+    grid-row-end: 2;
+    grid-column-start: 1;
+    grid-column-end: 2;
+}
+
+.expertise {
+    grid-row-start: 2;
+    grid-row-end: 5;
+    grid-column-start: 1;
+    grid-column-end: 2;
+}
+
+.boss-stats {
+    grid-row-start: 1;
+    grid-row-end: 4;
+    grid-column-start: 2;
+    grid-column-end: 4;
+}
+
+.log {
+    grid-row-start: 4;
+    grid-row-end: 5;
+    grid-column-start: 2;
+    grid-column-end: 4;
+}
+
+#output {
+    max-height: 70vh;
+    overflow-y: scroll;
+    font-size: 1em;
+    text-align: left;
+}
+
+.red-text {
+    color: red;
+}
+
+.green-text {
+    color: greenyellow;
+}
