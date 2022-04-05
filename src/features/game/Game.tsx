@@ -36,8 +36,17 @@ const initialBoss = {
     ]
 }
 
+interface gameState {
+    playerHP: number,
+    playerCooldown: number,
+    boss: null | boss,
+    bossHP: null | number,
+    bossCooldown: number,
+    gameLog: Array<string>
+}
+
 export function Game() {
-    const interval = 50;
+    const interval = 100;
 
     const initialPlayerHP = 100;
     const playerDamage = 10;
@@ -57,6 +66,8 @@ export function Game() {
 
     const [gameLog, setGameLog] = useState<Array<string>>([]);
 
+    const [lastUpdate, setLastUpdate] = useState(Date.now());
+
     const expertise = useAppSelector(selectExpertise);
     const dispatch = useAppDispatch();
 
@@ -73,96 +84,110 @@ export function Game() {
 
     // Game loop
     useEffect(() => {
-        function update() {
-            let newBoss = boss;
-            let newBossHP = bossHP;
-            let newBossCooldown = bossCooldown;
-            let newGameLog = gameLog;
-            let newPlayerHP = playerHP;
-            let newPlayerCooldown = playerCooldown;
-            if (newBoss === null) {
-                newBoss = initialBoss;
-                newBossHP = newBoss.HP;
+        function update(state: gameState) : gameState {
+            if (state.boss === null) {
+                state.boss = initialBoss;
+                state.bossHP = state.boss.HP;
             }
-            if (newBossHP === null) {
-                newBossHP = newBoss.HP;
+            if (state.bossHP === null) {
+                state.bossHP = state.boss.HP;
             }
-            if (bossCooldown <= 0) {
-                const nextAttack = newBoss.attacks[Math.floor(Math.random() * newBoss.attacks.length)];
-                let nextLog = `${newBoss.name} attacks with ${nextAttack.name}, `
+            if (state.bossCooldown <= 0) {
+                const nextAttack = state.boss.attacks[Math.floor(Math.random() * state.boss.attacks.length)];
+                let nextLog = `${state.boss.name} attacks with ${nextAttack.name}, `
 
-                let dodgeRate = expertise[`${newBoss.name}/${nextAttack.name}`];
+                let dodgeRate = expertise[`${state.boss.name}/${nextAttack.name}`];
                 if (dodgeRate === undefined) {
                     dodgeRate = 0;
                 }
                 if (Math.random() > dodgeRate) {
-                    dispatch(increase(`${newBoss.name}/${nextAttack.name}`));
-                    newGameLog = [
-                        ...newGameLog,
-
-                    ];
+                    dispatch(increase(`${state.boss.name}/${nextAttack.name}`));
                     nextLog += `you got hit for ${nextAttack.damage}!`
-                    newPlayerHP -= nextAttack.damage;
+                    state.playerHP -= nextAttack.damage;
                 } else {
-                    dispatch(increase(`${newBoss.name}/${nextAttack.name}`));
+                    dispatch(increase(`${state.boss.name}/${nextAttack.name}`));
                     nextLog += `but you dodged it!`
-
                 }
-                newGameLog = [
-                    ...newGameLog,
+                state.gameLog = [
+                    ...state.gameLog,
                     nextLog
                 ];
 
-                newBossCooldown = nextAttack.cooldown;
+                state.bossCooldown = nextAttack.cooldown;
             } else {
-                newBossCooldown -= interval;
+                state.bossCooldown -= interval;
             }
-            if (playerCooldown <= 0) {
-                newGameLog = [
-                    ...newGameLog,
+            if (state.playerCooldown <= 0) {
+                state.gameLog = [
+                    ...state.gameLog,
                     `Player attacks for ${playerDamage}!`
                 ];
-                newBossHP -= playerDamage;
+                state.bossHP -= playerDamage;
 
-                newPlayerCooldown = playerCooldownValue;
+                state.playerCooldown = playerCooldownValue;
             } else {
-                newPlayerCooldown -= interval;
+                state.playerCooldown -= interval;
             }
 
-
-            if (newPlayerHP <= 0) {
-                newGameLog = [
-                    ...newGameLog,
+            if (state.playerHP <= 0) {
+                state.gameLog = [
+                    ...state.gameLog,
                     deathMessage
                 ];
-                setGameLog(newGameLog);
-                resetGame();
-                return;
-            } else if (newBossHP <= 0) {
-                newGameLog = [
-                    ...newGameLog,
+                return {
+                    playerHP: 100,
+                    playerCooldown: playerCooldownValue,
+                    boss: initialBoss,
+                    bossHP: initialBoss.HP,
+                    bossCooldown: initialBossCooldown,
+                    gameLog: state.gameLog,
+                };
+            } else if (state.bossHP <= 0) {
+                state.gameLog = [
+                    ...state.gameLog,
                     successMessage
                 ];
-                setGameLog(newGameLog);
-                resetGame();
-                return;
-            } else {
-                setGameLog(newGameLog);
+                return {
+                    playerHP: 100,
+                    playerCooldown: playerCooldownValue,
+                    boss: initialBoss,
+                    bossHP: initialBoss.HP,
+                    bossCooldown: initialBossCooldown,
+                    gameLog: state.gameLog,
+                };
             }
 
-            if (newGameLog.length !== gameLog.length) {
-                scrollRef.current!.scrollTop = scrollRef.current!.scrollHeight;
-            }
-
-            setBoss(newBoss);
-            setBossHP(newBossHP);
-            setBossCooldown(newBossCooldown);
-            setPlayerHP(newPlayerHP);
-            setPlayerCooldown(newPlayerCooldown);
+            return state;
         }
 
         const timer = setTimeout(() => {
-            update();
+            const timeNow = Date.now();
+            const timeElapsed = timeNow - lastUpdate;
+
+            let state: gameState = {
+                playerHP: playerHP,
+                playerCooldown: playerCooldown,
+                boss: boss,
+                bossHP: bossHP,
+                bossCooldown: bossCooldown,
+                gameLog: gameLog,
+            }
+            for (let t = 0; t < timeElapsed; t += interval) {
+                state = update(state);
+            }
+
+            if (state.gameLog.length !== gameLog.length) {
+                scrollRef.current!.scrollTop = scrollRef.current!.scrollHeight;
+            }
+
+            setPlayerHP(state.playerHP);
+            setPlayerCooldown(state.playerCooldown);
+            setBoss(state.boss);
+            setBossHP(state.bossHP);
+            setBossCooldown(state.bossCooldown);
+            setGameLog(state.gameLog);
+
+            setLastUpdate(timeNow);
         }, interval);
 
         return () => clearTimeout(timer);
