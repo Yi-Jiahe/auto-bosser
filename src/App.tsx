@@ -4,9 +4,12 @@ import { Game } from './features/game/Game';
 
 function App() {
   function onClick() {
-    localStorage.removeItem("persist:auto-bosser");
     // eslint-disable-next-line no-restricted-globals
-    location.reload();
+    if (confirm("Are you sure you want to reset your progress?")) {
+      localStorage.removeItem("persist:auto-bosser");
+      // eslint-disable-next-line no-restricted-globals
+      location.reload();
+    }
   }
 
   return (
