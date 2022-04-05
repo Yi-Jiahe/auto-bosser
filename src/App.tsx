@@ -11,8 +11,8 @@ function App() {
   function onClick() {
     // eslint-disable-next-line no-restricted-globals
     if (confirm("Are you sure you want to reset your progress?")) {
-      dispatch(resetProgress);
-      dispatch(resetExpertise);
+      dispatch(resetProgress());
+      dispatch(resetExpertise());
       // eslint-disable-next-line no-restricted-globals
       location.reload();
     }

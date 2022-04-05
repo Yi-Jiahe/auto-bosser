@@ -45,7 +45,7 @@ export const progressSlice = createSlice({
                 ]
             }
         },
-        reset: () => {}
+        reset: (_state) => { return initialState; }
     }
 });
 

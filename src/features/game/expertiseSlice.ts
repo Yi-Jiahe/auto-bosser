@@ -26,7 +26,7 @@ export const expertiseSlice = createSlice({
                 state.expertise[action.payload] = currentExpertise + 0.01;
             }
         },
-        reset: () => {}
+        reset: (_state) => { return initialState; }
     }
 });
 
