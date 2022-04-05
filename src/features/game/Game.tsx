@@ -63,6 +63,7 @@ export function Game() {
     const scrollRef = useRef<null | HTMLDivElement>(null)
 
     function resetGame() {
+        scrollRef.current!.scrollTop = scrollRef.current!.scrollHeight;
         setPlayerHP(100);
         setPlayerCooldown(playerCooldownValue);
         setBoss(initialBoss);
