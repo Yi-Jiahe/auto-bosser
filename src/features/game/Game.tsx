@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import { ExpertiseChart } from "../graphing/Graphs";
+import { filterExpertiseByBoss } from "./expertise";
 import {
     increase,
     selectExpertise
 } from './expertiseSlice';
 import './Game.css';
-import { setBossProgress, selectBossProgress } from "./progressSlice.";
+import { setBossProgress, selectBossProgress, logAttempt, selectAttempts } from "./progressSlice.";
 
 interface attack {
     name: string,
@@ -64,6 +66,8 @@ interface gameState {
     gameLog: Array<string>
 }
 
+const data = Array(100).fill(0).map((_e, i) => [i * 0.01, i * 0.02, i * 0.03]) as Array<Array<number>>;
+
 export function Game() {
     const interval = 100;
 
@@ -77,6 +81,7 @@ export function Game() {
 
     const expertise = useAppSelector(selectExpertise);
     const bossProgress = useAppSelector(selectBossProgress);
+    const attemps = useAppSelector(selectAttempts);
     const dispatch = useAppDispatch();
 
     // Player state
@@ -145,6 +150,14 @@ export function Game() {
                     ...state.gameLog,
                     deathMessage
                 ];
+                dispatch(logAttempt({
+                    bossName: state.boss.name,
+                    attempt: {
+                        playerHP: state.playerHP,
+                        bossHP: state.bossHP,
+                        expertise: filterExpertiseByBoss(expertise, state.boss.name)
+                    }
+                }));
                 return {
                     playerHP: 100,
                     playerCooldown: playerCooldownValue,
@@ -158,11 +171,19 @@ export function Game() {
                     ...state.gameLog,
                     successMessage
                 ];
+                dispatch(logAttempt({
+                    bossName: state.boss.name,
+                    attempt: {
+                        playerHP: state.playerHP,
+                        bossHP: state.bossHP,
+                        expertise: filterExpertiseByBoss(expertise, state.boss.name)
+                    }
+                }));
                 let newBossProgress = bossProgress;
                 if (bossProgress < bosses.length - 1) {
                     newBossProgress += 1;
                     dispatch(setBossProgress(newBossProgress))
-                } 
+                }
                 return {
                     playerHP: 100,
                     playerCooldown: playerCooldownValue,
@@ -222,12 +243,10 @@ export function Game() {
                 <div>
                     {
                         boss === null ? "" :
-                            Object.keys(expertise)
-                                .filter(key => key.startsWith(boss.name))
+                            filterExpertiseByBoss(expertise, boss.name)
                                 .map((e, i) => {
-                                    return (
-                                        <div key={i}>{e}: {expertise[e].toFixed(2)}</div>
-                                    );
+                                    const attack = Object.keys(e)[0];
+                                    return <div key={i}>{attack}: {e[attack].toFixed(2)}</div>
                                 })
                     }
                 </div>
@@ -235,6 +254,10 @@ export function Game() {
             <div className="boss-stats">
                 <div>{boss === null ? "" : boss.name}</div>
                 <div>HP: {bossHP === null || bossHP === undefined ? "" : bossHP!.toFixed(0)}</div>
+            </div>
+            <div className="expertise-chart">
+                {boss === null ? "" : 
+                <ExpertiseChart attempts={attemps[boss.name]} width={1000} height={480} />}
             </div>
             <div className="log">
                 <div id="output" ref={scrollRef}>
