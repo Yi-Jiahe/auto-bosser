@@ -26,10 +26,11 @@ export const expertiseSlice = createSlice({
                 state.expertise[action.payload] = currentExpertise + 0.01;
             }
         },
+        reset: () => {}
     }
 });
 
-export const { increase } = expertiseSlice.actions;
+export const { increase, reset } = expertiseSlice.actions;
 
 export const selectExpertise = (state: RootState) => state.expertise.expertise;
 

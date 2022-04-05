@@ -45,10 +45,11 @@ export const progressSlice = createSlice({
                 ]
             }
         },
+        reset: () => {}
     }
 });
 
-export const { setBossProgress, logAttempt } = progressSlice.actions;
+export const { setBossProgress, logAttempt, reset } = progressSlice.actions;
 
 export const selectBossProgress = (state: RootState) => state.progress.boss;
 export const selectAttempts = (state: RootState) => state.progress.attempts;

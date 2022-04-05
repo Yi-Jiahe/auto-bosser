@@ -8,7 +8,7 @@ import {
     selectExpertise
 } from './expertiseSlice';
 import './Game.css';
-import { setBossProgress, selectBossProgress, logAttempt, selectAttempts } from "./progressSlice.";
+import { setBossProgress, selectBossProgress, logAttempt, selectAttempts } from "./progressSlice";
 
 interface attack {
     name: string,
@@ -55,7 +55,7 @@ const bosses: Array<boss> = [
             }
         ]
     }
-]
+];
 
 interface gameState {
     playerHP: number,

@@ -1,6 +1,6 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import expertiseReducer from '../features/game/expertiseSlice';
-import progressReducer from '../features/game/progressSlice.';
+import progressReducer from '../features/game/progressSlice';
 import storage from 'redux-persist/lib/storage';
 import { combineReducers } from 'redux';
 import {

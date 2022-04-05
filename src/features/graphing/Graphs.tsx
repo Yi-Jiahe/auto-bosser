@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import { attempt } from '../game/progressSlice.';
+import { attempt } from '../game/progressSlice';
 
 interface chartProps {
     attempts: Array<attempt>,
