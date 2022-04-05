@@ -79,7 +79,7 @@ export function Game() {
 
     const expertise = useAppSelector(selectExpertise);
     const bossProgress = useAppSelector(selectBossProgress);
-    const attemps = useAppSelector(selectAttempts);
+    const attempts = useAppSelector(selectAttempts);
     const dispatch = useAppDispatch();
 
     // Player state
@@ -254,8 +254,8 @@ export function Game() {
                 <div>HP: {bossHP === null || bossHP === undefined ? "" : bossHP!.toFixed(0)}</div>
             </div>
             <div className="expertise-chart">
-                {boss === null ? "" : 
-                <ExpertiseChart attempts={attemps[boss.name]} width={1000} height={480} />}
+                {boss === null || attempts === undefined ? "" : 
+                <ExpertiseChart attempts={attempts[boss.name]} width={1000} height={480} />}
             </div>
             <div className="log">
                 <div id="output" ref={scrollRef}>
