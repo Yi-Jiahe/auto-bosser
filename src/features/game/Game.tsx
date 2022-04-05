@@ -66,8 +66,6 @@ interface gameState {
     gameLog: Array<string>
 }
 
-const data = Array(100).fill(0).map((_e, i) => [i * 0.01, i * 0.02, i * 0.03]) as Array<Array<number>>;
-
 export function Game() {
     const interval = 100;
 
