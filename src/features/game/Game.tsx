@@ -6,6 +6,7 @@ import {
     selectExpertise
 } from './expertiseSlice';
 import './Game.css';
+import { setBossProgress, selectBossProgress } from "./progressSlice.";
 
 interface attack {
     name: string,
@@ -19,22 +20,40 @@ interface boss {
     attacks: Array<attack>,
 }
 
-const initialBoss = {
-    name: "Boss Man",
-    HP: 300,
-    attacks: [
-        {
-            name: "Punch",
-            damage: 20,
-            cooldown: 1000,
-        },
-        {
-            name: "Kick",
-            damage: 50,
-            cooldown: 3000,
-        }
-    ]
-}
+const bosses: Array<boss> = [
+    {
+        name: "Goblin",
+        HP: 150,
+        attacks: [
+            {
+                name: "Punch",
+                damage: 15,
+                cooldown: 1000,
+            },
+            {
+                name: "Kick",
+                damage: 40,
+                cooldown: 3000,
+            }
+        ]
+    },
+    {
+        name: "Big Goblin",
+        HP: 300,
+        attacks: [
+            {
+                name: "Punch",
+                damage: 20,
+                cooldown: 1000,
+            },
+            {
+                name: "Kick",
+                damage: 50,
+                cooldown: 3000,
+            }
+        ]
+    }
+]
 
 interface gameState {
     playerHP: number,
@@ -56,37 +75,29 @@ export function Game() {
     const deathMessage = "You Died!";
     const successMessage = "You Won!";
 
+    const expertise = useAppSelector(selectExpertise);
+    const bossProgress = useAppSelector(selectBossProgress);
+    const dispatch = useAppDispatch();
+
     // Player state
     const [playerHP, setPlayerHP] = useState(initialPlayerHP);
     const [playerCooldown, setPlayerCooldown] = useState(playerCooldownValue);
     // Boss state
-    const [bossHP, setBossHP] = useState<null | number>(300);
-    const [boss, setBoss] = useState<null | boss>(initialBoss);
+    const [boss, setBoss] = useState<null | boss>(bosses[bossProgress]);
+    const [bossHP, setBossHP] = useState<null | number>(bosses[bossProgress].HP);
     const [bossCooldown, setBossCooldown] = useState(initialBossCooldown);
 
     const [gameLog, setGameLog] = useState<Array<string>>([]);
 
     const [lastUpdate, setLastUpdate] = useState(Date.now());
 
-    const expertise = useAppSelector(selectExpertise);
-    const dispatch = useAppDispatch();
-
     const scrollRef = useRef<null | HTMLDivElement>(null)
-
-    function resetGame() {
-        scrollRef.current!.scrollTop = scrollRef.current!.scrollHeight;
-        setPlayerHP(100);
-        setPlayerCooldown(playerCooldownValue);
-        setBoss(initialBoss);
-        setBossHP(initialBoss.HP);
-        setBossCooldown(initialBossCooldown);
-    }
 
     // Game loop
     useEffect(() => {
-        function update(state: gameState) : gameState {
+        function update(state: gameState): gameState {
             if (state.boss === null) {
-                state.boss = initialBoss;
+                state.boss = bosses[bossProgress];
                 state.bossHP = state.boss.HP;
             }
             if (state.bossHP === null) {
@@ -137,8 +148,8 @@ export function Game() {
                 return {
                     playerHP: 100,
                     playerCooldown: playerCooldownValue,
-                    boss: initialBoss,
-                    bossHP: initialBoss.HP,
+                    boss: bosses[bossProgress],
+                    bossHP: bosses[bossProgress].HP,
                     bossCooldown: initialBossCooldown,
                     gameLog: state.gameLog,
                 };
@@ -147,11 +158,16 @@ export function Game() {
                     ...state.gameLog,
                     successMessage
                 ];
+                let newBossProgress = bossProgress;
+                if (bossProgress < bosses.length - 1) {
+                    newBossProgress += 1;
+                    dispatch(setBossProgress(newBossProgress))
+                } 
                 return {
                     playerHP: 100,
                     playerCooldown: playerCooldownValue,
-                    boss: initialBoss,
-                    bossHP: initialBoss.HP,
+                    boss: bosses[newBossProgress],
+                    bossHP: bosses[newBossProgress].HP,
                     bossCooldown: initialBossCooldown,
                     gameLog: state.gameLog,
                 };
