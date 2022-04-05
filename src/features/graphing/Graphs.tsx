@@ -110,7 +110,10 @@ export function ExpertiseChart({
 
         svg.append("g")
             .attr("transform", `translate(0, ${height - marginBottom})`)
-            .call(d3.axisBottom(scaleX));
+            .call(d3.axisBottom(scaleX)
+                .tickValues(scaleX.ticks().filter(tick => Number.isInteger(tick)))
+                .tickFormat(d3.format('d'))
+            );
         svg.append("g")
             .attr("transform", `translate(${marginLeft}, 0)`)
             .call(d3.axisLeft(scaleY));
