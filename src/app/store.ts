@@ -1,5 +1,4 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import counterReducer from '../features/counter/counterSlice';
 import expertiseReducer from '../features/game/expertiseSlice';
 import storage from 'redux-persist/lib/storage';
 import { combineReducers } from 'redux';
@@ -14,12 +13,11 @@ import {
 } from 'redux-persist';
 
 const persistConfig = {
-  key: 'game',
+  key: 'auto-bosser',
   storage,
 };
 
 const reducers = combineReducers({
-  counter: counterReducer,
   expertise: expertiseReducer,
 });
 

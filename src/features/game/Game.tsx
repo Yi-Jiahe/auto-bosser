@@ -73,7 +73,7 @@ export function Game() {
 
     // Game loop
     useEffect(() => {
-        const timer = setTimeout(() => {
+        function update() {
             let newBoss = boss;
             let newBossHP = bossHP;
             let newBossCooldown = bossCooldown;
@@ -99,7 +99,7 @@ export function Game() {
                     dispatch(increase(`${newBoss.name}/${nextAttack.name}`));
                     newGameLog = [
                         ...newGameLog,
-                       
+
                     ];
                     nextLog += `you got hit for ${nextAttack.damage}!`
                     newPlayerHP -= nextAttack.damage;
@@ -159,11 +159,14 @@ export function Game() {
             setBossCooldown(newBossCooldown);
             setPlayerHP(newPlayerHP);
             setPlayerCooldown(newPlayerCooldown);
+        }
+
+        const timer = setTimeout(() => {
+            update();
         }, interval);
 
         return () => clearTimeout(timer);
-    }
-    );
+    });
 
     return (
         <div className="grid-container">
