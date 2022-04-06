@@ -35,7 +35,16 @@ export function ExpertiseChart({
     const ref = useRef(null);
 
     useEffect(() => {
+        const svg = d3.select(ref.current);
+        // Clear old data
+        svg.selectAll("path").remove();
+        svg.selectAll("g").remove();
+        svg.selectAll("text").remove();
+        svg.selectAll("rect").remove();
+
         if (attempts === undefined) {
+
+
             return;
         }
 
@@ -50,15 +59,8 @@ export function ExpertiseChart({
             .range([ marginLeft, width - marginRight ])
             .padding(0.2);
         const HPBarScaleY = d3.scaleLinear()
-            .domain([0, d3.max(attempts, d => d.bossHP)] as [number, number])
+            .domain([0, d3.max(attempts, d => d3.max([d.playerHP, d.bossHP]))] as [number, number])
             .range([height - marginBottom, marginTop])
-        
-        const svg = d3.select(ref.current);
-        // Clear old data
-        svg.selectAll("path").remove();
-        svg.selectAll("g").remove();
-        svg.selectAll("text").remove();
-        svg.selectAll("rect").remove();
 
         const playerHPs = attempts.map((e, i) => [i+1, e.playerHP < 0 ? 0 : e.playerHP]);
 

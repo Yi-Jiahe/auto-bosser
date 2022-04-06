@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, useEffect, useRef, useState } from "react";
+import { formatWithOptions } from "util";
 
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { ExpertiseChart } from "../graphing/Graphs";
@@ -24,37 +25,80 @@ interface boss {
 
 const bosses: Array<boss> = [
     {
+        name: "Slime",
+        HP: 80,
+        attacks: [
+            {
+                name: "Bash",
+                damage: 10,
+                cooldown: 1500,
+            }
+        ]
+    },
+    {
+        name: "Stump",
+        HP: 100,
+        attacks: [
+            {
+                name: "Bash",
+                damage: 15,
+                cooldown: 2000,
+            }
+        ]
+    },
+    {
         name: "Goblin",
-        HP: 150,
+        HP: 120,
         attacks: [
             {
                 name: "Punch",
                 damage: 15,
-                cooldown: 1000,
+                cooldown: 2000,
             },
             {
                 name: "Kick",
-                damage: 40,
+                damage: 25,
                 cooldown: 3000,
             }
         ]
     },
     {
-        name: "Big Goblin",
-        HP: 300,
+        name: "Hobgoblin",
+        HP: 150,
         attacks: [
             {
                 name: "Punch",
-                damage: 20,
-                cooldown: 1000,
+                damage: 25,
+                cooldown: 2500,
             },
             {
                 name: "Kick",
-                damage: 50,
-                cooldown: 3000,
+                damage: 35,
+                cooldown: 3500,
             }
         ]
-    }
+    },
+    {
+        name: "Demon",
+        HP: 200,
+        attacks: [
+            {
+                name: "Fireball",
+                damage: 10,
+                cooldown: 1000,
+            },
+            {
+                name: "Jab",
+                damage: 15,
+                cooldown: 1500,
+            },
+            {
+                name: "Slash",
+                damage: 30,
+                cooldown: 2500,
+            }
+        ]
+    },
 ];
 
 interface gameState {
@@ -157,10 +201,10 @@ export function Game() {
                     }
                 }));
                 return {
-                    playerHP: 100,
+                    playerHP: initialPlayerHP,
                     playerCooldown: playerCooldownValue,
-                    boss: bosses[bossProgress],
-                    bossHP: bosses[bossProgress].HP,
+                    boss: state.boss,
+                    bossHP: state.boss.HP,
                     bossCooldown: initialBossCooldown,
                     gameLog: state.gameLog,
                 };
@@ -177,16 +221,11 @@ export function Game() {
                         expertise: filterExpertiseByBoss(expertise, state.boss.name)
                     }
                 }));
-                let newBossProgress = bossProgress;
-                if (bossProgress < bosses.length - 1) {
-                    newBossProgress += 1;
-                    dispatch(setBossProgress(newBossProgress))
-                }
                 return {
-                    playerHP: 100,
+                    playerHP: initialPlayerHP,
                     playerCooldown: playerCooldownValue,
-                    boss: bosses[newBossProgress],
-                    bossHP: bosses[newBossProgress].HP,
+                    boss: state.boss,
+                    bossHP: state.boss.HP,
                     bossCooldown: initialBossCooldown,
                     gameLog: state.gameLog,
                 };
@@ -228,6 +267,16 @@ export function Game() {
         return () => clearTimeout(timer);
     });
 
+    function onBossSelectChange(e: ChangeEvent<HTMLSelectElement>) {
+        const selectedBoss = bosses[parseInt(e.target.value)];
+        
+        setPlayerHP(initialPlayerHP);
+        setPlayerCooldown(playerCooldownValue);
+        setBoss(selectedBoss);
+        setBossHP(selectedBoss.HP);
+        setBossCooldown(initialBossCooldown);
+    }
+
     return (
         <div className="grid-container">
             <div className="player-stats">
@@ -250,7 +299,13 @@ export function Game() {
                 </div>
             </div>
             <div className="boss-stats">
-                <div>{boss === null ? "" : boss.name}</div>
+                <div>
+                    <select onChange={onBossSelectChange}>
+                        {bosses.map((e, i) => {
+                            return (<option value={i}>{e.name}</option>);
+                        })}
+                    </select>
+                </div>
                 <div>HP: {bossHP === null || bossHP === undefined ? "" : bossHP!.toFixed(0)}</div>
             </div>
             <div className="expertise-chart">
