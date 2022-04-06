@@ -8,7 +8,7 @@ import {
     selectExpertise
 } from './expertiseSlice';
 import './Game.css';
-import { selectBossProgress, logAttempt, selectAttempts } from "./progressSlice";
+import { logAttempt, selectAttempts } from "./progressSlice";
 
 interface attack {
     name: string,
@@ -121,7 +121,6 @@ export function Game() {
     const successMessage = "You Won!";
 
     const expertise = useAppSelector(selectExpertise);
-    const bossProgress = useAppSelector(selectBossProgress);
     const attempts = useAppSelector(selectAttempts);
     const dispatch = useAppDispatch();
 
@@ -129,8 +128,8 @@ export function Game() {
     const [playerHP, setPlayerHP] = useState(initialPlayerHP);
     const [playerCooldown, setPlayerCooldown] = useState(playerCooldownValue);
     // Boss state
-    const [boss, setBoss] = useState<null | boss>(bosses[bossProgress]);
-    const [bossHP, setBossHP] = useState<null | number>(bosses[bossProgress].HP);
+    const [boss, setBoss] = useState<null | boss>(bosses[0]);
+    const [bossHP, setBossHP] = useState<null | number>(bosses[0].HP);
     const [bossCooldown, setBossCooldown] = useState(initialBossCooldown);
 
     const [gameLog, setGameLog] = useState<Array<string>>([]);
@@ -143,7 +142,7 @@ export function Game() {
     useEffect(() => {
         function update(state: gameState): gameState {
             if (state.boss === null) {
-                state.boss = bosses[bossProgress];
+                state.boss = bosses[0];
                 state.bossHP = state.boss.HP;
             }
             if (state.bossHP === null) {
