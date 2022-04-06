@@ -1,5 +1,4 @@
-import { ChangeEvent, ChangeEventHandler, useEffect, useRef, useState } from "react";
-import { formatWithOptions } from "util";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 import { useAppSelector, useAppDispatch } from '../../app/hooks';
 import { ExpertiseChart } from "../graphing/Graphs";
@@ -9,7 +8,7 @@ import {
     selectExpertise
 } from './expertiseSlice';
 import './Game.css';
-import { setBossProgress, selectBossProgress, logAttempt, selectAttempts } from "./progressSlice";
+import { selectBossProgress, logAttempt, selectAttempts } from "./progressSlice";
 
 interface attack {
     name: string,
